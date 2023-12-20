@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Survey App</title>
+
+   
+  
+    {% include 'style.html' %}
+
+  
+
+    
+  
+</head>
+
+<body>
+
+        <div class="app">
+          <h1>Survey</h1>
+      
+            <div class="survey">
+                <h2 id="question">Qustions</h2>
+         
+                <div id="surveyQuestion">
+
+                
+                                
+                </div>
+    
+                <div class="text-line" id="text-line">
+                    <p class="left-text">not worth much</p>
+                    <p class="right-text">worth a lot</p>
+                </div>
+    
+                <!-- <div id="answer-buttons">
+                    <button class="btn" value="1">1 </button>            
+                    <button class="btn" value="2">2</button>
+                    <button class="btn" value="3">3</button>
+                    <button class="btn" value="4">4</button>
+                    <button class="btn" value="5">5</button>
+                    <button class="btn" value="6">6</button>
+                    <button class="btn" value="7">7</button>
+                    <button class="btn" value="8">8</button>
+                    <button class="btn" value="9">9 </button>            
+                </div>
+ -->
+                <!-- <div class="form-check" id="survey-answers"> -->
+              <form action="/survey_submitted" method="POST">
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="q1" value=1 >
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      1
+                    </label>
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="q2" value=2>
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      2
+                    </label>
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="q3" value=3>
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      3
+                    </label>
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="q4" value=4>
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      4
+                    </label>
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="q5" value=5>
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      5
+                    </label>
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="q6" value=6>
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      6
+                    </label>
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="q7" value=7>
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      7
+                    </label>
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="q8" value=8>
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      8
+                    </label>
+                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="q9" value=9>
+                    <label class="form-check-label" for="flexRadioDefault1">
+                      9
+                    </label>
+                
+              </form>
+                <!-- </div> -->
+    
+                <button id="next-btn">Next</button>
+                <input id="submit-btn" type="submit" value="Submit">
+    
+            </div>
+        
+    
+        </div>
+      
+ 
+
+    
+
+    <script>
+
+      const survey_questions = {{ survey_questions | tojson | safe }};
+
+      const questions = [];
+
+      for (let i = 0; i < 10; i++) {
+        const question = {
+          question: [
+            {
+              text: survey_questions[i][1]
+            },
+            {
+              text: survey_questions[i][2]
+            },
+            {
+              text: survey_questions[i][3]
+            },
+            {
+              text: survey_questions[i][4]
+            }
+          ]
+        };
+        questions.push(question);
+      }
+
+
+      
+      const questionElement=document.getElementById("question");
+    
+      // const surveyAnswers=document.getElementById("survey-answers");
+      
+      const q1=document.getElementById("q1");
+      const q2=document.getElementById("q2");
+      const q3=document.getElementById("q3");
+      const q4=document.getElementById("q4");
+      const q5=document.getElementById("q5");
+      const q6=document.getElementById("q6");
+      const q7=document.getElementById("q7");
+      const q8=document.getElementById("q8");
+      const q9=document.getElementById("q9");
+      
+      
+      const surveyQuestionElement=document.getElementById("surveyQuestion");
+      
+      const nextButton=document.getElementById("next-btn");
+      
+      const textLine=document.getElementById("text-line");
+ 
+      const submitButton = document.getElementById('submit-btn');
+      
+      
+      let currentQuestionIndex=0;
+      
+      function startSurvey(){
+          currentQuestionIndex=0;
+          nextButton.innerHTML="Next"
+          showQustions();
+      }
+      
+      function showQustions(){
+          resetState();
+
+          let currentQuestion= questions[currentQuestionIndex];
+
+        // add question number
+          let questionNo=currentQuestionIndex+1;
+          questionElement.innerHTML="Question "+questionNo+". ";
+
+        // add elements
+          currentQuestion.question.forEach(element => {
+              const p=document.createElement("p");
+              p.textContent=element.text;
+              surveyQuestionElement.appendChild(p);
+         
+          })
+
+         
+        
+      }
+
+
+      const resetState =() => {
+        
+        while(surveyQuestionElement.firstChild){
+          surveyQuestionElement.removeChild(surveyQuestionElement.firstChild);
+        }
+
+        
+      }
+      
+      nextButton.addEventListener("click", ()=>{
+          if(currentQuestionIndex < questions.length){
+              handleNextButton();
+          }
+          else{
+              showEnd();
+          }
+      })
+      
+      function handleNextButton(){
+          currentQuestionIndex++;
+          if(currentQuestionIndex<questions.length){
+              showQustions();
+          }
+          else{
+              showEnd();
+          }
+      }
+      
+ 
+      // Call this function to send the survey data
+      function showEnd() {
+          
+          questionElement.innerHTML = 'Thank you.';
+          textLine.style.display = 'none';
+
+          nextButton.style.display="none";
+          submitButton.style.display="block";
+
+    
+      }
+
+  
+      startSurvey();
+
+ 
+    </script>
+
+  
+    
+</body>
+</html>
